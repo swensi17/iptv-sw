@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: none;
+            animation: fadeIn 0.5s ease-out;
+            background: #0d1117;
+        }
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 52px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 0 20px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .header h1:hover {
+            transform: translateY(-2px);
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            letter-spacing: 4px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .search-input {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 12px 20px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            color: #c9d1d9;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #1f6feb;
+            box-shadow: 0 0 0 3px rgba(31,111,235,0.3);
+        }
+        .playlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .playlist-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+        .playlist-card::after {
+            content: "🎅";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            animation: santaBounce 2s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes santaBounce {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-5px) rotate(10deg);
+            }
+        }
+
+        .playlist-card:hover {
+            border-color: #1f6feb;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+        .country-flag {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 12px;
+            vertical-align: middle;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            filter: brightness(1.1) contrast(1.1) saturate(1.05);
+        }
+
+        /* Россия */
+        .country-flag[src*="ru"] {
+            filter: brightness(1.1) contrast(1.1) saturate(1.05)
+                   drop-shadow(0 0 2px rgba(255, 255, 255, 0.6))
+                   drop-shadow(0 0 4px rgba(0, 57, 166, 0.4))
+                   drop-shadow(0 0 6px rgba(213, 43, 30, 0.2));
+            animation: neonPulseRU 3s ease-in-out infinite;
+        }
+
+        @keyframes neonPulseRU {
+            0%, 100% {
+                filter: brightness(1.1) contrast(1.1) saturate(1.05)
+                       drop-shadow(0 0 2px rgba(255, 255, 255, 0.6))
+                       drop-shadow(0 0 4px rgba(0, 57, 166, 0.4))
+                       drop-shadow(0 0 6px rgba(213, 43, 30, 0.2));
+            }
+            50% {
+                filter: brightness(1.15) contrast(1.15) saturate(1.1)
+                       drop-shadow(0 0 3px rgba(255, 255, 255, 0.7))
+                       drop-shadow(0 0 5px rgba(0, 57, 166, 0.5))
+                       drop-shadow(0 0 7px rgba(213, 43, 30, 0.3));
+            }
+        }
+
+        /* США */
+        .country-flag[src*="us"] {
+            filter: brightness(1.1) contrast(1.1) saturate(1.05)
+                   drop-shadow(0 0 2px rgba(255, 255, 255, 0.6))
+                   drop-shadow(0 0 4px rgba(60, 59, 110, 0.4))
+                   drop-shadow(0 0 6px rgba(178, 34, 52, 0.2));
+            animation: neonPulseUS 3s ease-in-out infinite;
+        }
+
+        @keyframes neonPulseUS {
+            0%, 100% {
+                filter: brightness(1.1) contrast(1.1) saturate(1.05)
+                       drop-shadow(0 0 2px rgba(255, 255, 255, 0.6))
+                       drop-shadow(0 0 4px rgba(60, 59, 110, 0.4))
+                       drop-shadow(0 0 6px rgba(178, 34, 52, 0.2));
+            }
+            50% {
+                filter: brightness(1.15) contrast(1.15) saturate(1.1)
+                       drop-shadow(0 0 3px rgba(255, 255, 255, 0.7))
+                       drop-shadow(0 0 5px rgba(60, 59, 110, 0.5))
+                       drop-shadow(0 0 7px rgba(178, 34, 52, 0.3));
+            }
+        }
+
+        /* Германия */
+        .country-flag[src*="de"] {
+            filter: brightness(1.1) contrast(1.1) saturate(1.05)
+                   drop-shadow(0 0 2px rgba(0, 0, 0, 0.6))
+                   drop-shadow(0 0 4px rgba(221, 0, 0, 0.4))
+                   drop-shadow(0 0 6px rgba(255, 206, 0, 0.2));
+            animation: neonPulseDE 3s ease-in-out infinite;
+        }
+
+        @keyframes neonPulseDE {
+            0%, 100% {
+                filter: brightness(1.1) contrast(1.1) saturate(1.05)
+                       drop-shadow(0 0 2px rgba(0, 0, 0, 0.6))
+                       drop-shadow(0 0 4px rgba(221, 0, 0, 0.4))
+                       drop-shadow(0 0 6px rgba(255, 206, 0, 0.2));
+            }
+            50% {
+                filter: brightness(1.15) contrast(1.15) saturate(1.1)
+                       drop-shadow(0 0 3px rgba(0, 0, 0, 0.7))
+                       drop-shadow(0 0 5px rgba(221, 0, 0, 0.5))
+                       drop-shadow(0 0 7px rgba(255, 206, 0, 0.3));
+            }
+        }
+
+        /* Остальные флаги */
+        .country-flag:not([src*="ru"]):not([src*="us"]):not([src*="de"]) {
+            filter: brightness(1.1) contrast(1.1) saturate(1.05)
+                   drop-shadow(0 0 2px rgba(255, 255, 255, 0.6))
+                   drop-shadow(0 0 4px rgba(32, 156, 238, 0.4))
+                   drop-shadow(0 0 6px rgba(0, 247, 255, 0.2));
+            animation: neonPulseDefault 3s ease-in-out infinite;
+        }
+
+        @keyframes neonPulseDefault {
+            0%, 100% {
+                filter: brightness(1.1) contrast(1.1) saturate(1.05)
+                       drop-shadow(0 0 2px rgba(255, 255, 255, 0.6))
+                       drop-shadow(0 0 4px rgba(32, 156, 238, 0.4))
+                       drop-shadow(0 0 6px rgba(0, 247, 255, 0.2));
+            }
+            50% {
+                filter: brightness(1.15) contrast(1.15) saturate(1.1)
+                       drop-shadow(0 0 3px rgba(255, 255, 255, 0.7))
+                       drop-shadow(0 0 5px rgba(32, 156, 238, 0.5))
+                       drop-shadow(0 0 7px rgba(0, 247, 255, 0.3));
+            }
+        }
+
+        /* Усиление эффекта при наведении */
+        .playlist-card:hover .country-flag {
+            transform: scale(1.08);
+        }
+
+        .playlist-card:hover .country-flag[src*="ru"] {
+            filter: brightness(1.2) contrast(1.15) saturate(1.1)
+                   drop-shadow(0 0 3px rgba(255, 255, 255, 0.8))
+                   drop-shadow(0 0 5px rgba(0, 57, 166, 0.6))
+                   drop-shadow(0 0 7px rgba(213, 43, 30, 0.4));
+        }
+
+        .playlist-card:hover .country-flag[src*="us"] {
+            filter: brightness(1.2) contrast(1.15) saturate(1.1)
+                   drop-shadow(0 0 3px rgba(255, 255, 255, 0.8))
+                   drop-shadow(0 0 5px rgba(60, 59, 110, 0.6))
+                   drop-shadow(0 0 7px rgba(178, 34, 52, 0.4));
+        }
+
+        .playlist-card:hover .country-flag[src*="de"] {
+            filter: brightness(1.2) contrast(1.15) saturate(1.1)
+                   drop-shadow(0 0 3px rgba(0, 0, 0, 0.8))
+                   drop-shadow(0 0 5px rgba(221, 0, 0, 0.6))
+                   drop-shadow(0 0 7px rgba(255, 206, 0, 0.4));
+        }
+
+        .playlist-card:hover .country-flag:not([src*="ru"]):not([src*="us"]):not([src*="de"]) {
+            filter: brightness(1.2) contrast(1.15) saturate(1.1)
+                   drop-shadow(0 0 3px rgba(255, 255, 255, 0.8))
+                   drop-shadow(0 0 5px rgba(32, 156, 238, 0.6))
+                   drop-shadow(0 0 7px rgba(0, 247, 255, 0.4));
+        }
+
+        .playlist-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+            color: #c9d1d9;
+            display: flex;
+            align-items: center;
+        }
+        .playlist-info {
+            position: relative;
+            font-size: 24px;
+            margin: 8px 0;
+            font-weight: 600;
+            background: linear-gradient(135deg, #2196f3 0%, #00c6ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(33, 150, 243, 0.4);
+            text-align: center;
+            padding: 3px 0;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 1px;
+            transform: scale(0.95);
+        }
+        .playlist-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(45deg, #238636, #2ea043);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(35,134,54,0.2);
+        }
+        .playlist-link:hover {
+            background: linear-gradient(45deg, #2ea043, #3ac350);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(35,134,54,0.3);
+            color: #ffffff;
+        }
+        .channel-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .channel-item {
+            padding: 12px 20px;
+            border: 1px solid #30363d;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            background: #161b22;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out;
+        }
+        .channel-item:hover {
+            border-color: #1f6feb;
+            transform: translateX(4px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .channel-logo {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+        .channel-name {
+            flex-grow: 1;
+            color: #c9d1d9;
+            font-size: 16px;
+        }
+        #player-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .video-js {
+            width: 85%;
+            height: 85%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .video-js .vjs-control-bar {
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7));
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
+        }
+        .video-js .vjs-big-play-button {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            transition: all 0.3s ease;
+        }
+        .video-js .vjs-big-play-button:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+        .video-js .vjs-control:hover {
+            transform: scale(1.1);
+        }
+        .video-js .vjs-progress-holder {
+            height: 5px;
+        }
+        .video-js .vjs-progress-holder .vjs-play-progress {
+            background: linear-gradient(to right, #00ff87, #60efff);
+        }
+        .video-js .vjs-load-progress {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .video-js .vjs-time-tooltip {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .channel-info {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        .channel-info:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.02);
+        }
+        .channel-info img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .video-quality-display {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        .video-quality-display:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.05);
+        }
+        .player-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1010;
+        }
+        .player-button {
+            background: rgba(35, 134, 54, 0.8);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        .player-button:hover {
+            background: rgba(35, 134, 54, 1);
+            transform: translateY(-2px);
+        }
+        .player-button i {
+            font-size: 16px;
+        }
+        .quality-selector {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+            z-index: 1010;
+            backdrop-filter: blur(5px);
+        }
+        .quality-selector.show {
+            display: block;
+        }
+        .quality-option {
+            color: white;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        .quality-option:hover {
+            background: rgba(35, 134, 54, 0.8);
+        }
+        .quality-option.active {
+            background: rgba(35, 134, 54, 1);
+        }
+        .back-button {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #238636;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            border: none;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background: #2ea043;
+            color: #ffffff;
+        }
+
+        /* Стили для видеоплеера */
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-js {
+            width: 100%;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        /* Панель управления */
+        .video-js .vjs-control-bar {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7));
+            height: 3.5rem;
+            padding: 0 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-js:hover .vjs-control-bar {
+            opacity: 1;
+        }
+
+        /* Кнопки управления */
+        .video-js .vjs-button {
+            width: 2.5rem;
+            height: 2.5rem;
+            margin: 0 0.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .video-js .vjs-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Прогресс-бар */
+        .video-js .vjs-progress-control {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0.3rem;
+            margin: 0;
+            transition: height 0.2s ease;
+        }
+
+        .video-js .vjs-progress-control:hover {
+            height: 0.5rem;
+            cursor: pointer;
+        }
+
+        .video-js .vjs-progress-holder {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0;
+        }
+
+        .video-js .vjs-play-progress {
+            background: linear-gradient(to right, #00ff87, #60efff);
+        }
+
+        .video-js .vjs-load-progress {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Время */
+        .video-js .vjs-time-control {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            padding: 0 0.5rem;
+            min-width: 3rem;
+            text-align: center;
+        }
+
+        .video-js .vjs-remaining-time {
+            display: none;
+        }
+
+        /* Громкость */
+        .video-js .vjs-volume-panel {
+            display: flex;
+            align-items: center;
+            margin-right: 0.5rem;
+            width: 8rem;
+            transition: width 0.2s ease;
+        }
+
+        .video-js .vjs-mute-control {
+            width: 2.5rem;
+            height: 2.5rem;
+            margin: 0;
+        }
+
+        .video-js .vjs-volume-control {
+            width: 5rem;
+            height: 0.3rem;
+            margin: 0 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.15rem;
+        }
+
+        .video-js .vjs-volume-bar {
+            margin: 0;
+            height: 100%;
+            background: transparent;
+        }
+
+        .video-js .vjs-volume-level {
+            height: 100%;
+            background: #2196f3;
+            border-radius: 0.15rem;
+        }
+
+        /* Качество потока */
+        .stream-quality {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-container:hover .stream-quality {
+            opacity: 1;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .video-js .vjs-control-bar {
+                height: 4rem;
+            }
+
+            .video-js .vjs-button {
+                width: 3rem;
+                height: 3rem;
+            }
+
+            .video-js .vjs-volume-panel {
+                width: 6rem;
+            }
+
+            .video-js .vjs-volume-control {
+                width: 3rem;
+            }
+
+            .stream-quality {
+                font-size: 1rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        /* Стили для ошибок */
+        .error-message {
+            text-align: center;
+            padding: 20px;
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin: 20px;
+        }
+
+        .info-blocks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px auto;
+            max-width: 1200px;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .info-blocks.hidden {
+            opacity: 0;
+            visibility: hidden;
+            display: none;
+        }
+
+        .info-block {
+            background: linear-gradient(135deg, rgba(29, 35, 48, 0.95) 0%, rgba(19, 23, 32, 0.95) 100%);
+            border: 1px solid #30363d;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-block:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(31, 111, 235, 0.2);
+            border-color: #1f6feb;
+        }
+
+        .info-block .number {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #2196f3, #1976d2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .info-block .label {
+            font-size: 18px;
+            color: #8b949e;
+            margin-bottom: 15px;
+        }
+
+        .info-block .icon {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #1f6feb;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Новогодний стиль */
+        .snow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .snow span {
+            position: fixed;
+            pointer-events: none;
+            color: #fff;
+            font-size: 24px;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                opacity: 0;
+            }
+            3% {
+                opacity: 0.9;
+            }
+            90% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translate(0, 97vh);
+                opacity: 0;
+            }
+        }
+
+        /* Переменные для тем */
+        :root {
+            /* Светлая тема */
+            --bg-color: #ffffff;
+            --text-color: #1f2328;
+            --card-bg: #f6f8fa;
+            --hover-bg: #eaeef2;
+            --button-bg: #f6f8fa;
+            --button-hover: #eaeef2;
+            --border-color: #d0d7de;
+            --shadow-color: rgba(31, 35, 40, 0.1);
+            --button-text: #1f2328;
+        }
+
+        /* Темная тема */
+        [data-theme="dark"] {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --card-bg: #161b22;
+            --hover-bg: #1c2129;
+            --button-bg: #21262d;
+            --button-hover: #30363d;
+            --border-color: #30363d;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --button-text: #c9d1d9;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Стили для кнопок настроек */
+        .settings-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 999;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .settings-button, .github-button {
+            background: var(--button-bg);
+            color: var(--button-text);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            width: 120px; /* Фиксированная ширина */
+            justify-content: center;
+            height: 40px; /* Фиксированная высота */
+        }
+
+        .settings-button i, .github-button i {
+            font-size: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .settings-button span {
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Эффект свечения при наведении */
+        .settings-button::before, .github-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.6s;
+        }
+
+        .settings-button:hover::before, .github-button:hover::before {
+            left: 100%;
+        }
+
+        .settings-button:hover, .github-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px var(--shadow-color);
+            border-color: var(--border-color);
+            background: var(--button-hover);
+        }
+
+        .settings-button:hover i, .github-button:hover i {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .settings-button:active, .github-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        .settings-button.active {
+            background: var(--button-hover);
+            border-color: var(--border-color);
+        }
+
+        .settings-button.active i {
+            animation: pulseIcon 2s infinite;
+        }
+
+        @keyframes pulseIcon {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Карточки плейлистов */
+        .playlist-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .playlist-card:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--border-color);
+        }
+
+        /* Поле поиска */
+        .search-input {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            background-color: var(--hover-bg);
+            border-color: var(--border-color);
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            .settings-buttons {
+                top: 10px;
+                right: 10px;
+                gap: 8px;
+            }
+
+            .settings-button, .github-button {
+                width: 100px;
+                height: 36px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .settings-button i, .github-button i {
+                font-size: 14px;
+            }
+        }
+
+        /* Стили для панели плейлистов */
+        .header {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .header h1 {
+            color: var(--text-color);
+            margin: 0;
+            transition: color 0.3s ease;
+        }
+
+        .playlist-container {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .playlist-title {
+            color: var(--text-color);
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .playlist-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .playlist-card:hover {
+            background-color: var(--hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .playlist-card h3 {
+            color: var(--text-color);
+            margin: 0;
+            transition: color 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Добавляем снег -->
+    <div class="snow" id="snow"></div>
+    <div class="settings-buttons">
+        <button class="settings-button" id="languageToggle">
+            <i class="fas fa-language"></i> <span>RU</span>
+        </button>
+        <button class="settings-button" id="themeToggle">
+            <i class="fas fa-moon"></i> <span>Тема</span>
+        </button>
+        <a href="https://github.com/swensi17" class="github-button" target="_blank">
+            <i class="fab fa-github"></i> <span>GitHub</span>
+        </a>
+    </div>
+    <div class="container">
+        <div class="header">
+            <h1>IPTV</h1>
+            <input type="text" class="search-input" placeholder="Поиск..." id="searchInput">
+        </div>
+
+        <div id="playlistGrid" class="playlist-grid">
+            <!-- Список стран будет добавлен через JavaScript -->
+        </div>
+
+        <div id="channelList" style="display: none;">
+            <button class="back-button" id="backButton">← Назад</button>
+            <div class="channel-list">
+                <!-- Список каналов будет добавлен через JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div id="player-container">
+        <div class="channel-info">
+            <img id="channelLogo" src="" alt="Channel Logo">
+            <div>
+                <h3 id="channelName"></h3>
+                <p id="channelCountry"></p>
+            </div>
+        </div>
+        
+        <div class="player-controls">
+            <button class="player-button" id="qualityButton">
+                <i class="fas fa-cog"></i> Качество
+            </button>
+            <button class="player-button" id="fullscreenButton">
+                <i class="fas fa-expand"></i> На весь экран
+            </button>
+            <button class="player-button" id="closePlayer">
+                <i class="fas fa-times"></i> Закрыть
+            </button>
+        </div>
+
+        <div class="quality-selector" id="qualitySelector">
+            <div class="quality-option active" data-quality="auto">Авто</div>
+            <div class="quality-option" data-quality="1080p">1080p</div>
+            <div class="quality-option" data-quality="720p">720p</div>
+            <div class="quality-option" data-quality="480p">480p</div>
+            <div class="quality-option" data-quality="360p">360p</div>
+        </div>
+
+        <video id="videoPlayer" class="video-js vjs-big-play-centered vjs-theme-city">
+            <p class="vjs-no-js">
+                Для просмотра видео включите JavaScript
+            </p>
+        </video>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    <script>
+        let player = null;
+        let currentChannel = null;
+
+        // Инициализация плеера
+        function initializePlayer(streamUrl, channelInfo) {
+            if (player) {
+                player.dispose();
+            }
+
+            player = videojs('videoPlayer', {
+                controls: true,
+                autoplay: true,
+                preload: 'auto',
+                fluid: true,
+                playbackRates: [0.5, 1, 1.5, 2],
+                controlBar: {
+                    children: [
+                        'playToggle',
+                        'volumePanel',
+                        'currentTimeDisplay',
+                        'timeDivider',
+                        'durationDisplay',
+                        'progressControl',
+                        'playbackRateMenuButton',
+                        'fullscreenToggle'
+                    ]
+                }
+            });
+
+            player.src({
+                src: streamUrl,
+                type: 'application/x-mpegURL'
+            });
+
+            // Обновляем информацию о канале
+            currentChannel = channelInfo;
+            updateChannelInfo(channelInfo);
+
+            // Показываем плеер
+            document.getElementById('player-container').style.display = 'flex';
+            
+            // Анимация появления информации о канале
+            setTimeout(() => {
+                document.querySelector('.channel-info').classList.add('show');
+            }, 100);
+
+            // Добавляем горячие клавиши
+            document.addEventListener('keydown', handleKeyPress);
+
+            // Обновляем информацию о качестве видео
+            updateVideoQuality(player);
+        }
+
+        // Обновление информации о канале
+        function updateChannelInfo(channelInfo) {
+            document.getElementById('channelLogo').src = channelInfo.logo || 'path/to/default/logo.png';
+            document.getElementById('channelName').textContent = channelInfo.name;
+            document.getElementById('channelCountry').textContent = channelInfo.country;
+        }
+
+        // Обновляем информацию о качестве видео
+        function updateVideoQuality(player) {
+            // Удаляем старый элемент качества, если он существует
+            const oldQuality = document.querySelector('.video-quality-display');
+            if (oldQuality) oldQuality.remove();
+
+            // Создаем новый элемент для отображения качества
+            const qualityDisplay = document.createElement('div');
+            qualityDisplay.className = 'video-quality-display';
+            
+            // Получаем текущее качество видео
+            const videoElement = player.el().querySelector('video');
+            const height = videoElement.videoHeight;
+            let quality;
+            
+            if (height >= 1080) quality = '1080p HD';
+            else if (height >= 720) quality = '720p HD';
+            else if (height >= 480) quality = '480p';
+            else if (height >= 360) quality = '360p';
+            else quality = 'Auto';
+
+            // Добавляем иконку качества
+            qualityDisplay.innerHTML = `<i class="fas fa-signal"></i> ${quality}`;
+            
+            // Добавляем элемент в плеер
+            player.el().appendChild(qualityDisplay);
+        }
+
+        // Обработка горячих клавиш
+        function handleKeyPress(e) {
+            if (!player) return;
+
+            switch(e.key.toLowerCase()) {
+                case 'f':
+                    player.isFullscreen() ? player.exitFullscreen() : player.requestFullscreen();
+                    break;
+                case 'm':
+                    player.muted(!player.muted());
+                    break;
+                case ' ':
+                    player.paused() ? player.play() : player.pause();
+                    e.preventDefault();
+                    break;
+                case 'arrowup':
+                    player.volume(Math.min(player.volume() + 0.1, 1));
+                    e.preventDefault();
+                    break;
+                case 'arrowdown':
+                    player.volume(Math.max(player.volume() - 0.1, 0));
+                    e.preventDefault();
+                    break;
+                case 'escape':
+                    closePlayer();
+                    break;
+            }
+        }
+
+        // Закрытие плеера
+        function closePlayer() {
+            document.querySelector('.channel-info').classList.remove('show');
+            document.getElementById('player-container').style.display = 'none';
+            if (player) {
+                player.pause();
+            }
+            document.removeEventListener('keydown', handleKeyPress);
+        }
+
+        // Обработчики событий для кнопок управления
+        document.getElementById('closePlayer').addEventListener('click', closePlayer);
+        
+        document.getElementById('fullscreenButton').addEventListener('click', () => {
+            if (player) {
+                player.isFullscreen() ? player.exitFullscreen() : player.requestFullscreen();
+            }
+        });
+
+        document.getElementById('qualityButton').addEventListener('click', () => {
+            document.getElementById('qualitySelector').classList.toggle('show');
+        });
+
+        // Обработчик выбора качества
+        document.querySelectorAll('.quality-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                document.querySelectorAll('.quality-option').forEach(opt => opt.classList.remove('active'));
+                e.target.classList.add('active');
+                document.getElementById('qualitySelector').classList.remove('show');
+                
+                // Здесь можно добавить логику переключения качества
+                const quality = e.target.dataset.quality;
+                // player.setQuality(quality);
+            });
+        });
+
+        // Функция для показа списка каналов
+        function showChannelList() {
+            document.getElementById('player-container').style.display = 'none';
+            document.getElementById('channelList').style.display = 'block';
+            document.getElementById('playlistGrid').style.display = 'none';
+        }
+
+        // Функция для показа списка плейлистов
+        function showPlaylistGrid() {
+            document.getElementById('player-container').style.display = 'none';
+            document.getElementById('channelList').style.display = 'none';
+            document.getElementById('playlistGrid').style.display = 'grid';
+        }
+
+        // Обновляем функцию загрузки каналов
+        async function loadChannels(countryCode) {
+            const response = await fetch(`playlists/${countryCode}.m3u`);
+            const data = await response.text();
+            const channels = parseM3U(data);
+            displayChannels(channels);
+            showChannelList();
+            // Добавляем новое состояние в историю браузера
+            history.pushState({ page: 'channels', countryCode }, '', `#${countryCode}`);
+        }
+
+        // Обновляем функцию воспроизведения канала
+        function playChannel(streamUrl, channelInfo) {
+            initializePlayer(streamUrl, channelInfo);
+            updateChannelInfo(channelInfo);
+            document.getElementById('player-container').style.display = 'block';
+            document.getElementById('channelList').style.display = 'none';
+            document.getElementById('playlistGrid').style.display = 'none';
+            // Добавляем состояние плеера в историю
+            history.pushState({ page: 'player', streamUrl, channelInfo }, '', '#play');
+        }
+
+        // Обработчик кнопки назад в браузере
+        window.addEventListener('popstate', (event) => {
+            showPlaylistGrid();
+        });
+
+        // Обработчик кнопки "назад"
+        document.getElementById('backButton').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPlaylistGrid();
+        });
+
+        // Category filtering functionality
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        let activeCategory = null;
+        let selectedCountries = new Set();
+
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const category = button.dataset.category;
+                
+                if (activeCategory === category) {
+                    // Deactivate current category
+                    button.classList.remove('active');
+                    activeCategory = null;
+                    removeFilterDropdown();
+                } else {
+                    // Deactivate previous category
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    // Activate new category
+                    button.classList.add('active');
+                    activeCategory = category;
+                    showFilterDropdown(button);
+                }
+                
+                filterChannels();
+            });
+
+            // Add filter icon click handler
+            const filterIcon = button.querySelector('.filter-icon');
+            filterIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleFilterDropdown(button);
+            });
+        });
+
+        function createFilterDropdown(countries) {
+            const dropdown = document.createElement('div');
+            dropdown.className = 'filter-dropdown';
+            
+            countries.forEach(country => {
+                const label = document.createElement('label');
+                label.className = 'country-checkbox';
+                
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.value = country.code;
+                input.checked = selectedCountries.has(country.code);
+                
+                const customCheckbox = document.createElement('span');
+                customCheckbox.className = 'checkbox-custom';
+                
+                const text = document.createTextNode(country.name);
+                
+                label.appendChild(input);
+                label.appendChild(customCheckbox);
+                label.appendChild(text);
+                
+                input.addEventListener('change', () => {
+                    if (input.checked) {
+                        selectedCountries.add(country.code);
+                    } else {
+                        selectedCountries.delete(country.code);
+                    }
+                    filterChannels();
+                });
+                
+                dropdown.appendChild(label);
+            });
+
+            return dropdown;
+        }
+
+        function showFilterDropdown(button) {
+            removeFilterDropdown();
+            const dropdown = createFilterDropdown(countries);
+            button.appendChild(dropdown);
+            setTimeout(() => dropdown.classList.add('show'), 0);
+        }
+
+        function toggleFilterDropdown(button) {
+            const existingDropdown = button.querySelector('.filter-dropdown');
+            if (existingDropdown) {
+                existingDropdown.classList.remove('show');
+                setTimeout(() => existingDropdown.remove(), 300);
+            } else {
+                showFilterDropdown(button);
+            }
+        }
+
+        function removeFilterDropdown() {
+            const existingDropdown = document.querySelector('.filter-dropdown');
+            if (existingDropdown) {
+                existingDropdown.classList.remove('show');
+                setTimeout(() => existingDropdown.remove(), 300);
+            }
+        }
+
+        // Click outside to close dropdown
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.category-btn')) {
+                removeFilterDropdown();
+            }
+        });
+
+        function filterChannels() {
+            const searchTerm = searchInput.value.toLowerCase();
+            let filteredChannels = channels;
+
+            // Apply category filter
+            if (activeCategory) {
+                filteredChannels = filteredChannels.filter(channel => {
+                    const channelCategory = getChannelCategory(channel);
+                    return channelCategory === activeCategory;
+                });
+            }
+
+            // Apply country filter
+            if (selectedCountries.size > 0) {
+                filteredChannels = filteredChannels.filter(channel => {
+                    return selectedCountries.has(channel.country);
+                });
+            }
+
+            // Apply search filter
+            filteredChannels = filteredChannels.filter(channel => {
+                return channel.name.toLowerCase().includes(searchTerm) ||
+                       channel.group.toLowerCase().includes(searchTerm);
+            });
+
+            displayChannels(filteredChannels);
+        }
+
+        // Update existing search input handler
+        searchInput.addEventListener('input', filterChannels);
+
+        // Загрузка стран при загрузке страницы
+        async function loadCountries() {
+            const countries = [
+                { code: 'ru', name: 'Россия' },
+                { code: 'us', name: 'США' },
+                { code: 'gb', name: 'Великобритания' },
+                { code: 'de', name: 'Германия' },
+                { code: 'fr', name: 'Франция' },
+                { code: 'it', name: 'Италия' },
+                { code: 'es', name: 'Испания' },
+                { code: 'cn', name: 'Китай' },
+                { code: 'jp', name: 'Япония' },
+                { code: 'kr', name: 'Южная Корея' },
+                { code: 'in', name: 'Индия' },
+                { code: 'br', name: 'Бразилия' },
+                { code: 'ca', name: 'Канада' },
+                { code: 'au', name: 'Австралия' },
+                { code: 'ae', name: 'ОАЭ' },
+                { code: 'sa', name: 'Саудовская Аравия' },
+                { code: 'tr', name: 'Турция' },
+                { code: 'pl', name: 'Польша' },
+                { code: 'nl', name: 'Нидерланды' },
+                { code: 'be', name: 'Бельгия' },
+                { code: 'se', name: 'Швеция' },
+                { code: 'no', name: 'Норвегия' },
+                { code: 'fi', name: 'Финляндия' },
+                { code: 'dk', name: 'Дания' },
+                { code: 'ch', name: 'Швейцария' },
+                { code: 'at', name: 'Австрия' },
+                { code: 'ie', name: 'Ирландия' },
+                { code: 'nz', name: 'Новая Зеландия' },
+                { code: 'gr', name: 'Греция' },
+                { code: 'pt', name: 'Португалия' },
+                { code: 'cz', name: 'Чехия' },
+                { code: 'hu', name: 'Венгрия' },
+                { code: 'ro', name: 'Румыния' },
+                { code: 'bg', name: 'Болгария' },
+                { code: 'hr', name: 'Хорватия' },
+                { code: 'rs', name: 'Сербия' },
+                { code: 'sk', name: 'Словакия' },
+                { code: 'si', name: 'Словения' },
+                { code: 'ee', name: 'Эстония' },
+                { code: 'lv', name: 'Латвия' },
+                { code: 'lt', name: 'Литва' },
+                { code: 'by', name: 'Беларусь' },
+                { code: 'ua', name: 'Украина' },
+                { code: 'md', name: 'Молдова' },
+                { code: 'ge', name: 'Грузия' },
+                { code: 'am', name: 'Армения' },
+                { code: 'az', name: 'Азербайджан' },
+                { code: 'kz', name: 'Казахстан' },
+                { code: 'uz', name: 'Узбекистан' },
+                { code: 'kg', name: 'Киргизия' },
+                { code: 'tj', name: 'Таджикистан' },
+                { code: 'tm', name: 'Туркменистан' },
+                { code: 'mn', name: 'Монголия' },
+                { code: 'vn', name: 'Вьетнам' },
+                { code: 'th', name: 'Таиланд' },
+                { code: 'id', name: 'Индонезия' },
+                { code: 'my', name: 'Малайзия' },
+                { code: 'ph', name: 'Филиппины' },
+                { code: 'sg', name: 'Сингапур' },
+                { code: 'mm', name: 'Мьянма' },
+                { code: 'la', name: 'Лаос' },
+                { code: 'kh', name: 'Камбоджа' },
+                { code: 'bn', name: 'Бруней' },
+                { code: 'mo', name: 'Макао' },
+                { code: 'tw', name: 'Тайвань' },
+                { code: 'hk', name: 'Гонконг' },
+                { code: 'il', name: 'Израиль' },
+                { code: 'lb', name: 'Ливан' },
+                { code: 'jo', name: 'Иордания' },
+                { code: 'sy', name: 'Сирия' },
+                { code: 'iq', name: 'Ирак' },
+                { code: 'ir', name: 'Иран' },
+                { code: 'eg', name: 'Египет' },
+                { code: 'ma', name: 'Марокко' },
+                { code: 'dz', name: 'Алжир' },
+                { code: 'tn', name: 'Тунис' },
+                { code: 'ly', name: 'Ливия' },
+                { code: 'ng', name: 'Нигерия' },
+                { code: 'za', name: 'ЮАР' },
+                { code: 'ke', name: 'Кения' },
+                { code: 'gh', name: 'Гана' },
+                { code: 'ug', name: 'Уганда' },
+                { code: 'tz', name: 'Танзания' },
+                { code: 'mx', name: 'Мексика' },
+                { code: 'ar', name: 'Аргентина' },
+                { code: 'cl', name: 'Чили' },
+                { code: 'co', name: 'Колумбия' },
+                { code: 'pe', name: 'Перу' },
+                { code: 've', name: 'Венесуэла' },
+                { code: 'ec', name: 'Эквадор' },
+                { code: 'bo', name: 'Боливия' },
+                { code: 'py', name: 'Парагвай' },
+                { code: 'uy', name: 'Уругвай' },
+                { code: 'cr', name: 'Коста-Рика' },
+                { code: 'pa', name: 'Панама' },
+                { code: 'do', name: 'Доминиканская Республика' },
+                { code: 'pr', name: 'Пуэрто-Рико' },
+                { code: 'cu', name: 'Куба' },
+                { code: 'is', name: 'Исландия' },
+                { code: 'lu', name: 'Люксембург' },
+                { code: 'mt', name: 'Мальта' },
+                { code: 'cy', name: 'Кипр' },
+                { code: 'ad', name: 'Андорра' },
+                { code: 'mc', name: 'Монако' },
+                { code: 'np', name: 'Непал' },
+                { code: 'lk', name: 'Шри-Ланка' },
+                { code: 'bd', name: 'Бангладеш' },
+                { code: 'mv', name: 'Мальдивы' },
+                { code: 'bt', name: 'Бутан' },
+                { code: 'sn', name: 'Сенегал' },
+                { code: 'et', name: 'Эфиопия' },
+                { code: 'rw', name: 'Руанда' },
+                { code: 'zw', name: 'Зимбабве' },
+                { code: 'na', name: 'Намибия' },
+                { code: 'gt', name: 'Гватемала' },
+                { code: 'hn', name: 'Гондурас' },
+                { code: 'sv', name: 'Сальвадор' },
+                { code: 'ni', name: 'Никарагуа' },
+                { code: 'jm', name: 'Ямайка' },
+                { code: 'bs', name: 'Багамы' }
+            ];
+
+            const channelCounts = {
+                'ru': 150,
+                'us': 120,
+                'gb': 85,
+                'de': 95,
+                'fr': 80,
+                'it': 75,
+                'es': 70,
+                'cn': 65,
+                'jp': 60,
+                'kr': 55,
+                'in': 90,
+                'br': 50,
+                'ca': 65,
+                'au': 45,
+                'ae': 30,
+                'sa': 35,
+                'tr': 60,
+                'pl': 45,
+                'nl': 40,
+                'be': 35,
+                'se': 30,
+                'no': 25,
+                'fi': 25,
+                'dk': 25,
+                'ch': 30,
+                'at': 30,
+                'ie': 25,
+                'nz': 20,
+                'gr': 35,
+                'pt': 30,
+                'cz': 35,
+                'hu': 30,
+                'ro': 35,
+                'bg': 30,
+                'hr': 25,
+                'rs': 25,
+                'sk': 25,
+                'si': 20,
+                'ee': 20,
+                'lv': 20,
+                'lt': 20,
+                'by': 30,
+                'ua': 45,
+                'md': 20,
+                'ge': 25,
+                'am': 20,
+                'az': 25,
+                'kz': 30,
+                'uz': 20,
+                'kg': 15,
+                'tj': 15,
+                'tm': 15,
+                'mn': 20,
+                'vn': 35,
+                'th': 40,
+                'id': 45,
+                'my': 35,
+                'ph': 30,
+                'sg': 25,
+                'mm': 20,
+                'la': 15,
+                'kh': 15,
+                'bn': 10,
+                'mo': 15,
+                'tw': 45,
+                'hk': 40,
+                'il': 35,
+                'lb': 25,
+                'jo': 20,
+                'sy': 15,
+                'iq': 25,
+                'ir': 30,
+                'eg': 40,
+                'ma': 30,
+                'dz': 25,
+                'tn': 20,
+                'ly': 15,
+                'ng': 25,
+                'za': 35,
+                'ke': 20,
+                'gh': 15,
+                'ug': 15,
+                'tz': 15,
+                'mx': 60,
+                'ar': 45,
+                'cl': 35,
+                'co': 30,
+                'pe': 25,
+                've': 25,
+                'ec': 20,
+                'bo': 15,
+                'py': 15,
+                'uy': 15,
+                'cr': 15,
+                'pa': 15,
+                'do': 20,
+                'pr': 20,
+                'cu': 15,
+                'is': 15,
+                'lu': 15,
+                'mt': 10,
+                'cy': 15,
+                'ad': 5,
+                'mc': 5,
+                'np': 20,
+                'lk': 25,
+                'bd': 30,
+                'mv': 10,
+                'bt': 10,
+                'sn': 20,
+                'et': 15,
+                'rw': 10,
+                'zw': 15,
+                'na': 10,
+                'gt': 20,
+                'hn': 15,
+                'sv': 15,
+                'ni': 15,
+                'jm': 15,
+                'bs': 10
+            };
+
+            const grid = document.getElementById('playlistGrid');
+            grid.innerHTML = '';
+
+            // Сортируем страны по алфавиту
+            countries.sort((a, b) => a.name.localeCompare(b.name));
+
+            countries.forEach(country => {
+                const card = document.createElement('div');
+                card.className = 'playlist-card';
+                card.style.animationDelay = `${Math.random() * 0.5}s`;
+
+                const flagUrl = `https://raw.githubusercontent.com/lipis/flag-icons/master/flags/4x3/${country.code.toLowerCase()}.svg`;
+                
+                card.innerHTML = `
+                    <h2 class="playlist-title">
+                        <img src="${flagUrl}" alt="${country.name} flag" class="country-flag" onerror="this.src='https://hatscripts.github.io/circle-flags/flags/${country.code.toLowerCase()}.svg'">
+                        ${country.name}
+                    </h2>
+                    <div class="playlist-info">${channelCounts[country.code.toLowerCase()] || 0} каналов</div>
+                    <a href="#" class="playlist-link" data-country="${country.code}">Открыть список</a>
+                `;
+
+                card.querySelector('.playlist-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loadChannels(country.code);
+                });
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Функция для парсинга M3U файла
+        function parseM3U(data) {
+            const channels = [];
+            const lines = data.split('\n');
+            let currentChannel = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (line.startsWith('#EXTINF:')) {
+                    // Парсим информацию о канале
+                    const titleMatch = line.match(/,(.+)$/);
+                    const tvgIdMatch = line.match(/tvg-id="([^"]*)"/) || line.match(/tvg-name="([^"]*)"/);
+                    const logoMatch = line.match(/tvg-logo="([^"]*)"/);
+                    
+                    currentChannel = {
+                        name: titleMatch ? titleMatch[1].trim() : 'Unnamed Channel',
+                        logo: logoMatch ? logoMatch[1] : null,
+                        id: tvgIdMatch ? tvgIdMatch[1] : null
+                    };
+                } else if (line.startsWith('http') && currentChannel) {
+                    // Добавляем URL потока и сохраняем канал
+                    currentChannel.url = line;
+                    channels.push(currentChannel);
+                    currentChannel = null;
+                }
+            });
+
+            return channels;
+        }
+
+        // Загрузка каналов выбранной страны
+        async function loadChannels(countryCode) {
+            try {
+                const response = await fetch(`streams/${countryCode}.m3u`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.text();
+                const channels = parseM3U(data);
+
+                document.getElementById('playlistGrid').style.display = 'none';
+                const channelList = document.getElementById('channelList');
+                channelList.style.display = 'block';
+
+                const channelListContainer = channelList.querySelector('.channel-list');
+                channelListContainer.innerHTML = '';
+
+                channels.forEach(channel => {
+                    const item = document.createElement('div');
+                    item.className = 'channel-item';
+                    
+                    // Пытаемся найти логотип канала
+                    let logoUrl = channel.logo;
+                    if (!logoUrl) {
+                        // Если логотип не указан в M3U, пытаемся найти его по ID канала
+                        if (channel.id) {
+                            logoUrl = `https://raw.githubusercontent.com/Tapiosinn/tv-logos/master/countries/${countryCode}/${channel.id}.png`;
+                        }
+                    }
+
+                    item.innerHTML = `
+                        <img src="${logoUrl || 'placeholder.png'}" class="channel-logo" alt="${channel.name}" 
+                             onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/Tapiosinn/tv-logos/master/countries/${countryCode}/${channel.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.png';">
+                        <span class="channel-name">${channel.name}</span>
+                    `;
+                    
+                    item.addEventListener('click', () => playChannel(channel.url, channel));
+                    channelListContainer.appendChild(item);
+                });
+
+                // Добавляем запись в историю браузера
+                history.pushState({ page: 'channels', country: countryCode }, '', `#${countryCode}`);
+            } catch (error) {
+                console.error('Ошибка загрузки каналов:', error);
+                // Показываем сообщение об ошибке пользователю
+                const channelListContainer = document.getElementById('channelList').querySelector('.channel-list');
+                channelListContainer.innerHTML = `
+                    <div class="error-message">
+                        Не удалось загрузить список каналов для этой страны.<br>
+                        Пожалуйста, попробуйте позже.
+                    </div>
+                `;
+            }
+        }
+
+        // Обновляем функцию воспроизведения канала
+        async function playChannel(streamUrl, channelInfo) {
+            initializePlayer(streamUrl, channelInfo);
+        }
+
+        // Обработчики событий
+        document.getElementById('backButton').addEventListener('click', () => {
+            history.back();
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.playlist-card');
+            const channels = document.querySelectorAll('.channel-item');
+
+            cards.forEach(card => {
+                const title = card.querySelector('.playlist-title').textContent.toLowerCase();
+                card.style.display = title.includes(searchTerm) ? 'block' : 'none';
+            });
+
+            channels.forEach(channel => {
+                const name = channel.querySelector('.channel-name').textContent.toLowerCase();
+                channel.style.display = name.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+
+        // Загрузка стран при загрузке страницы
+        window.addEventListener('load', () => {
+            loadCountries();
+            // Устанавливаем начальное состояние
+            window.history.replaceState({ view: 'grid' }, '');
+        });
+
+        let isBackButtonPressed = false;
+
+        // Предотвращаем выход с сайта при нажатии кнопки назад
+        window.addEventListener('beforeunload', function(e) {
+            if (!isBackButtonPressed) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Обработка кнопки назад
+        window.addEventListener('popstate', function(e) {
+            isBackButtonPressed = true;
+            
+            const state = e.state || { view: 'grid' };
+            const videoPlayer = document.getElementById('videoPlayer');
+            const channelList = document.getElementById('channelList');
+            const playlistGrid = document.getElementById('playlistGrid');
+            const infoBlocks = document.querySelector('.info-blocks');
+
+            switch(state.view) {
+                case 'player':
+                    videoPlayer.style.display = 'block';
+                    channelList.style.display = 'none';
+                    playlistGrid.style.display = 'none';
+                    infoBlocks.style.display = 'none';
+                    break;
+                    
+                case 'channels':
+                    videoPlayer.style.display = 'none';
+                    channelList.style.display = 'block';
+                    playlistGrid.style.display = 'none';
+                    infoBlocks.style.display = 'none';
+                    if (state.country) {
+                        showChannelList(state.country, false);
+                    }
+                    break;
+                    
+                case 'grid':
+                default:
+                    videoPlayer.style.display = 'none';
+                    channelList.style.display = 'none';
+                    playlistGrid.style.display = 'grid';
+                    infoBlocks.style.display = 'flex';
+                    const player = videojs('videoElement');
+                    player.pause();
+                    break;
+            }
+            
+            setTimeout(() => {
+                isBackButtonPressed = false;
+            }, 100);
+        });
+
+        function showPlayer(url, channelName) {
+            const videoPlayer = document.getElementById('videoPlayer');
+            const playlistGrid = document.getElementById('playlistGrid');
+            const channelList = document.getElementById('channelList');
+            const infoBlocks = document.querySelector('.info-blocks');
+            
+            videoPlayer.style.display = 'block';
+            playlistGrid.style.display = 'none';
+            channelList.style.display = 'none';
+            if (infoBlocks) {
+                infoBlocks.style.display = 'none';
+            }
+            
+            const player = videojs('videoElement');
+            player.src({
+                src: url,
+                type: 'application/x-mpegURL'
+            });
+            player.play();
+            
+            document.getElementById('currentChannelName').textContent = channelName;
+            window.history.pushState({ view: 'player', url, channelName }, '');
+        }
+
+        function hidePlayer() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            const channelList = document.getElementById('channelList');
+            const playlistGrid = document.getElementById('playlistGrid');
+            const infoBlocks = document.querySelector('.info-blocks');
+            
+            const player = videojs('videoElement');
+            player.pause();
+            videoPlayer.style.display = 'none';
+            
+            if (channelList.style.display === 'block') {
+                if (infoBlocks) {
+                    infoBlocks.style.display = 'none';
+                }
+                window.history.back();
+            } else {
+                playlistGrid.style.display = 'grid';
+                if (infoBlocks) {
+                    infoBlocks.style.display = 'flex';
+                }
+                window.history.pushState({ view: 'grid' }, '');
+            }
+        }
+
+        // Создаем снежинки
+        function createSnow() {
+            const snow = document.getElementById('snow');
+            const snowflakes = ['❄', '❅', '❆', '✧', '✦'];
+            const numberOfSnowflakes = 50;
+
+            for (let i = 0; i < numberOfSnowflakes; i++) {
+                const span = document.createElement('span');
+                const size = Math.random() * 1.5;
+                
+                span.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+                span.style.left = Math.random() * 100 + '%';
+                span.style.opacity = Math.random();
+                span.style.fontSize = 10 + size * 20 + 'px';
+                span.style.animation = `fall ${5 + Math.random() * 10}s linear infinite`;
+                span.style.animationDelay = -Math.random() * 10 + 's';
+                
+                snow.appendChild(span);
+            }
+        }
+
+        // Запускаем создание снега при загрузке страницы
+        window.addEventListener('load', createSnow);
+        
+        // Переводы
+        const translations = {
+            'ru': {
+                'search': 'Поиск...',
+                'theme': 'Тема',
+                'language': 'Язык',
+                'back': 'Назад',
+                'quality': 'Качество',
+                'close': 'Закрыть',
+                'fullscreen': 'На весь экран',
+                'categories': 'Категории',
+                'all': 'Все',
+                'countries': {
+                    'Russia': 'Россия',
+                    'USA': 'США',
+                    'Germany': 'Германия',
+                    'France': 'Франция',
+                    'United Kingdom': 'Великобритания',
+                    'Italy': 'Италия',
+                    'Spain': 'Испания',
+                    'Canada': 'Канада',
+                    'Australia': 'Австралия',
+                    'Japan': 'Япония'
+                },
+                'cities': {
+                    'Moscow': 'Москва',
+                    'Saint Petersburg': 'Санкт-Петербург',
+                    'Novosibirsk': 'Новосибирск',
+                    'Yekaterinburg': 'Екатеринбург'
+                }
+            },
+            'en': {
+                'search': 'Search...',
+                'theme': 'Theme',
+                'language': 'Language',
+                'back': 'Back',
+                'quality': 'Quality',
+                'close': 'Close',
+                'fullscreen': 'Fullscreen',
+                'categories': 'Categories',
+                'all': 'All',
+                'countries': {
+                    'Россия': 'Russia',
+                    'США': 'USA',
+                    'Германия': 'Germany',
+                    'Франция': 'France',
+                    'Великобритания': 'United Kingdom',
+                    'Италия': 'Italy',
+                    'Испания': 'Spain',
+                    'Канада': 'Canada',
+                    'Австралия': 'Australia',
+                    'Япония': 'Japan'
+                },
+                'cities': {
+                    'Москва': 'Moscow',
+                    'Санкт-Петербург': 'Saint Petersburg',
+                    'Новосибирск': 'Novosibirsk',
+                    'Екатеринбург': 'Yekaterinburg'
+                }
+            }
+        };
+
+        let currentLang = 'ru';
+        let currentTheme = 'dark';
+
+        // Функция перевода текста
+        function translateText(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        // Функция перевода городов
+        function translateCity(city) {
+            return translations[currentLang].cities[city] || city;
+        }
+
+        // Функция перевода стран
+        function translateCountry(country) {
+            return translations[currentLang].countries[country] || country;
+        }
+
+        // Функция обновления интерфейса при смене языка
+        function updateLanguage() {
+            // Обновляем поисковую строку
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.placeholder = translateText('search');
+            }
+
+            // Обновляем кнопки в шапке
+            const themeToggle = document.querySelector('#themeToggle span');
+            const languageToggle = document.querySelector('#languageToggle span');
+            if (themeToggle) themeToggle.textContent = translateText('theme');
+            if (languageToggle) languageToggle.textContent = translateText('language');
+
+            // Обновляем кнопки управления плеером
+            const backButton = document.querySelector('#backButton span');
+            const closeButton = document.querySelector('#closePlayer span');
+            const fullscreenButton = document.querySelector('#fullscreenButton span');
+            const qualityDisplay = document.querySelector('.video-quality-display');
+            
+            if (backButton) backButton.textContent = translateText('back');
+            if (closeButton) closeButton.textContent = translateText('close');
+            if (fullscreenButton) fullscreenButton.textContent = translateText('fullscreen');
+            if (qualityDisplay) {
+                const qualityText = qualityDisplay.textContent;
+                const quality = qualityText.match(/\d+p/)?.[0] || '';
+                qualityDisplay.textContent = `${translateText('quality')}: ${quality}`;
+            }
+
+            // Обновляем категории
+            const categoryBtn = document.querySelector('.category-btn span');
+            if (categoryBtn) {
+                categoryBtn.textContent = translateText('categories');
+            }
+            const allCategoryOption = document.querySelector('.filter-option[data-category="all"]');
+            if (allCategoryOption) {
+                allCategoryOption.textContent = translateText('all');
+            }
+
+            // Перевод названий стран в фильтре
+            document.querySelectorAll('.filter-option').forEach(option => {
+                const countryName = option.getAttribute('data-category');
+                if (countryName && countryName !== 'all') {
+                    const translatedCountry = translateCountry(countryName);
+                    option.textContent = translatedCountry;
+                }
+            });
+
+            // Перевод названий городов в плейлистах
+            document.querySelectorAll('.playlist-card h3').forEach(title => {
+                const cityName = title.textContent.trim();
+                const translatedCity = translateCity(cityName);
+                if (translatedCity !== cityName) {
+                    title.textContent = translatedCity;
+                }
+            });
+
+            // Перевод названий стран в карточках
+            document.querySelectorAll('.playlist-info').forEach(info => {
+                const countryName = info.textContent.trim();
+                const translatedCountry = translateCountry(countryName);
+                if (translatedCountry !== countryName) {
+                    info.textContent = translatedCountry;
+                }
+            });
+        }
+        
+        // Функция переключения языка
+        function toggleLanguage() {
+            currentLang = currentLang === 'ru' ? 'en' : 'ru';
+            updateLanguage();
+            
+            const langBtn = document.getElementById('languageToggle');
+            langBtn.classList.add('active');
+            setTimeout(() => langBtn.classList.remove('active'), 2000);
+        }
+
+        // Функция переключения темы
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            
+            const themeBtn = document.getElementById('themeToggle');
+            themeBtn.classList.add('active');
+            setTimeout(() => themeBtn.classList.remove('active'), 2000);
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Устанавливаем начальную тему
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            
+            // Устанавливаем обработчики событий
+            const languageToggle = document.getElementById('languageToggle');
+            const themeToggle = document.getElementById('themeToggle');
+
+            // Удаляем старые обработчики событий, если они есть
+            languageToggle.replaceWith(languageToggle.cloneNode(true));
+            themeToggle.replaceWith(themeToggle.cloneNode(true));
+
+            // Добавляем новые обработчики
+            document.getElementById('languageToggle').addEventListener('click', toggleLanguage);
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+            // Инициализируем язык
+            updateLanguage();
+        });
+    </script>
+</body>
+</html>
