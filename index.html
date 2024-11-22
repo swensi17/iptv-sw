@@ -25,7 +25,13 @@
             padding: 40px 0;
             border-bottom: none;
             animation: fadeIn 0.5s ease-out;
-            background: #0d1117;
+            background: var(--header-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            transition: all 0.3s ease;
         }
         .header h1 {
             font-family: 'Orbitron', sans-serif;
@@ -41,6 +47,7 @@
             padding: 0 20px;
             transition: all 0.3s ease;
             text-transform: uppercase;
+            color: var(--text-color);
         }
 
         .header h1:hover {
@@ -58,16 +65,15 @@
         }
         .search-input {
             width: 100%;
-            max-width: 600px;
-            margin: 20px auto;
             padding: 12px 20px;
-            background: #161b22;
-            border: 1px solid #30363d;
+            background: var(--search-bg);
+            border: 1px solid var(--border-color);
             border-radius: 10px;
-            color: #c9d1d9;
+            color: var(--text-color);
             font-size: 16px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px var(--shadow-color);
+            margin-bottom: 12px;
         }
         .search-input:focus {
             outline: none;
@@ -82,9 +88,8 @@
             animation: fadeIn 0.5s ease-out;
         }
         .playlist-card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 12px;
+            background: var(--search-bg);
+            border: 1px solid var(--border-color);
             padding: 20px;
             transition: all 0.3s ease;
             animation: slideIn 0.5s ease-out;
@@ -264,7 +269,7 @@
             font-size: 18px;
             font-weight: 600;
             margin: 0;
-            color: #c9d1d9;
+            color: var(--text-color);
             display: flex;
             align-items: center;
         }
@@ -309,22 +314,24 @@
             animation: fadeIn 0.5s ease-out;
         }
         .channel-item {
+            background: var(--channel-bg);
+            border: 1px solid var(--border-color);
             padding: 12px 20px;
-            border: 1px solid #30363d;
             margin-bottom: 12px;
             border-radius: 10px;
-            background: #161b22;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 16px;
             transition: all 0.3s ease;
             animation: slideIn 0.5s ease-out;
+            box-shadow: 0 2px 4px var(--shadow-color);
         }
         .channel-item:hover {
-            border-color: #1f6feb;
-            transform: translateX(4px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+            background: var(--hover-bg);
+            border-color: var(--border-color);
+            box-shadow: 0 4px 8px var(--shadow-color);
         }
         .channel-logo {
             width: 32px;
@@ -334,8 +341,9 @@
         }
         .channel-name {
             flex-grow: 1;
-            color: #c9d1d9;
+            color: var(--text-color);
             font-size: 16px;
+            transition: color 0.3s ease;
         }
         #player-container {
             position: fixed;
@@ -786,212 +794,85 @@
         }
 
         /* Переменные для тем */
-        :root {
-            /* Светлая тема */
-            --bg-color: #ffffff;
-            --text-color: #1f2328;
-            --card-bg: #f6f8fa;
-            --hover-bg: #eaeef2;
-            --button-bg: #f6f8fa;
-            --button-hover: #eaeef2;
-            --border-color: #d0d7de;
-            --shadow-color: rgba(31, 35, 40, 0.1);
-            --button-text: #1f2328;
+        :root[data-theme="dark"] {
+            --bg-color: #0d1117;
+            --search-bg: #161b22;
+            --channel-bg: #161b22;
+            --iptv-bg: #161b22;
+            --logo-bg: #161b22;
+            --header-bg: #161b22;
+            --text-color: #c9d1d9;
+            --border-color: #30363d;
+            --hover-bg: #1f2937;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --button-hover: #238636;
         }
 
-        /* Темная тема */
-        [data-theme="dark"] {
-            --bg-color: #0d1117;
-            --text-color: #c9d1d9;
-            --card-bg: #161b22;
-            --hover-bg: #1c2129;
-            --button-bg: #21262d;
-            --button-hover: #30363d;
-            --border-color: #30363d;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --button-text: #c9d1d9;
+        :root[data-theme="light"] {
+            --bg-color: #ffffff;
+            --search-bg: #f6f8fa;
+            --channel-bg: #f6f8fa;
+            --iptv-bg: #f6f8fa;
+            --logo-bg: #f6f8fa;
+            --header-bg: #f6f8fa;
+            --text-color: #24292f;
+            --border-color: #d0d7de;
+            --hover-bg: #eaeef2;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --button-hover: #2ea043;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            transition: all 0.3s ease;
         }
 
         /* Стили для кнопок настроек */
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
         .settings-buttons {
-            position: fixed;
-            top: 20px;
-            right: 20px;
             display: flex;
-            gap: 15px;
-            z-index: 999;
-            animation: slideIn 0.5s ease-out;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .settings-button, .github-button {
-            background: var(--button-bg);
-            color: var(--button-text);
+            background: var(--search-bg);
+            color: var(--text-color);
             border: 1px solid var(--border-color);
-            padding: 10px 20px;
-            border-radius: 12px;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 500;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            position: relative;
-            overflow: hidden;
-            text-decoration: none;
-            width: 120px; /* Фиксированная ширина */
+            gap: 8px;
+            width: 110px;
             justify-content: center;
-            height: 40px; /* Фиксированная высота */
-        }
-
-        .settings-button i, .github-button i {
-            font-size: 16px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            z-index: 2;
-        }
-
-        .settings-button span {
-            font-size: 13px;
-            text-transform: uppercase;
-            font-weight: 600;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Эффект свечения при наведении */
-        .settings-button::before, .github-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                120deg,
-                transparent,
-                rgba(255, 255, 255, 0.2),
-                transparent
-            );
-            transition: 0.6s;
-        }
-
-        .settings-button:hover::before, .github-button:hover::before {
-            left: 100%;
+            height: 36px;
+            box-shadow: 0 2px 4px var(--shadow-color);
         }
 
         .settings-button:hover, .github-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px var(--shadow-color);
-            border-color: var(--border-color);
-            background: var(--button-hover);
-        }
-
-        .settings-button:hover i, .github-button:hover i {
-            transform: rotate(10deg) scale(1.1);
+            background: var(--hover-bg);
+            border-color: #1f6feb;
+            box-shadow: 0 4px 8px var(--shadow-color);
         }
 
         .settings-button:active, .github-button:active {
             transform: translateY(1px);
-            box-shadow: 0 4px 8px var(--shadow-color);
         }
-
-        .settings-button.active {
-            background: var(--button-hover);
-            border-color: var(--border-color);
-        }
-
-        .settings-button.active i {
-            animation: pulseIcon 2s infinite;
-        }
-
-        @keyframes pulseIcon {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Карточки плейлистов */
-        .playlist-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .playlist-card:hover {
-            background-color: var(--hover-bg);
-            border-color: var(--border-color);
-        }
-
-        /* Поле поиска */
-        .search-input {
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            background-color: var(--hover-bg);
-            border-color: var(--border-color);
-        }
-
-        /* Мобильная адаптация */
-        @media (max-width: 768px) {
-            .settings-buttons {
-                top: 10px;
-                right: 10px;
-                gap: 8px;
-            }
-
-            .settings-button, .github-button {
-                width: 100px;
-                height: 36px;
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-
-            .settings-button i, .github-button i {
-                font-size: 14px;
-            }
-        }
-
-        /* Стили для панели плейлистов */
-        .header {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .header h1 {
-            color: var(--text-color);
-            margin: 0;
-            transition: color 0.3s ease;
-        }
-
         .playlist-container {
-            background-color: var(--card-bg);
+            background-color: var(--search-bg);
             padding: 20px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
@@ -1005,7 +886,7 @@
         }
 
         .playlist-card {
-            background-color: var(--card-bg);
+            background-color: var(--search-bg);
             border: 1px solid var(--border-color);
             padding: 15px;
             margin-bottom: 10px;
@@ -1025,26 +906,77 @@
             margin: 0;
             transition: color 0.3s ease;
         }
+
+        .iptv-block {
+            background: var(--iptv-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .iptv-block h2 {
+            color: var(--text-color);
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .iptv-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+            border-color: var(--border-color);
+        }
+
+        /* Обновленные стили для логотипа IPTV */
+        .logo {
+            background: var(--logo-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .logo h1 {
+            color: var(--text-color);
+            font-size: 2.5em;
+            margin: 0;
+            transition: color 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+            border-color: var(--border-color);
+        }
     </style>
 </head>
 <body>
     <!-- Добавляем снег -->
     <div class="snow" id="snow"></div>
-    <div class="settings-buttons">
-        <button class="settings-button" id="languageToggle">
-            <i class="fas fa-language"></i> <span>RU</span>
-        </button>
-        <button class="settings-button" id="themeToggle">
-            <i class="fas fa-moon"></i> <span>Тема</span>
-        </button>
-        <a href="https://github.com/swensi17" class="github-button" target="_blank">
-            <i class="fab fa-github"></i> <span>GitHub</span>
-        </a>
-    </div>
     <div class="container">
         <div class="header">
-            <h1>IPTV</h1>
-            <input type="text" class="search-input" placeholder="Поиск..." id="searchInput">
+            <div class="logo">
+                <h1>IPTV</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Поиск..." id="searchInput">
+                <div class="settings-buttons">
+                    <button class="settings-button" id="languageToggle">
+                        <i class="fas fa-language"></i> <span>RU</span>
+                    </button>
+                    <button class="settings-button" id="themeToggle">
+                        <i class="fas fa-moon"></i> <span>Тема</span>
+                    </button>
+                    <a href="https://github.com/swensi17" class="github-button" target="_blank">
+                        <i class="fab fa-github"></i> <span>GitHub</span>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div id="playlistGrid" class="playlist-grid">
